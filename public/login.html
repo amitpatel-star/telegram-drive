@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TeleVault 🔐 — Unlock Your Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #e8e4d9;
+      --bg-card: #ffffff;
+      --money-green: #0ead69;
+      --money-dark: #0a7c4a;
+      --money-light: #b8f5d5;
+      --gold: #fbbf24;
+      --gold-light: #fef3c7;
+      --cash-red: #ef4444;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --border: #1a1a2e;
+      --border-w: 3px;
+      --shadow: 5px 5px 0px #1a1a2e;
+      --shadow-sm: 3px 3px 0px #1a1a2e;
+      --shadow-lg: 8px 8px 0px #1a1a2e;
+      --radius: 8px;
+      --font-mono: 'Space Mono', monospace;
+      --font-main: 'Space Grotesk', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background Pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 41px),
+        repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 41px);
+      pointer-events: none;
+    }
+
+    /* Floating $ signs */
+    .money-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .money-float {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--money-green);
+      opacity: 0.06;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) rotate(0deg); }
+      100% { transform: translateY(-100px) rotate(360deg); }
+    }
+
+    /* Login Card */
+    .login-container {
+      position: relative;
+      z-index: 1;
+      width: 90%;
+      max-width: 420px;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: var(--border-w) solid var(--border);
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      text-align: center;
+    }
+
+    /* Logo */
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .login-logo-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--money-green);
+      border: var(--border-w) solid var(--border);
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .login-logo-text {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .login-logo-text .green { color: var(--money-green); }
+
+    .login-divider {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin: 16px 0;
+      letter-spacing: 3px;
+    }
+
+    /* Lock Icon */
+    .lock-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--gold-light);
+      border: var(--border-w) solid var(--border);
+      box-shadow: var(--shadow-sm);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 2rem;
+    }
+
+    .login-title {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .login-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* QR Code */
+    .qr-container {
+      background: white;
+      border: var(--border-w) solid var(--border);
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    .qr-container img {
+      width: 200px;
+      height: 200px;
+      display: block;
+    }
+
+    .setup-secret {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      word-break: break-all;
+      margin-bottom: 20px;
+      color: var(--money-dark);
+    }
+
+    .setup-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .setup-step {
+      text-align: left;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
+    .setup-step strong {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .setup-step ol {
+      padding-left: 20px;
+      margin-top: 6px;
+    }
+
+    /* Code Input */
+    .code-input-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .code-digit {
+      width: 48px;
+      height: 58px;
+      background: var(--bg);
+      border: var(--border-w) solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: inset 2px 2px 0 rgba(0,0,0,0.05);
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text);
+      outline: none;
+      transition: all 0.12s;
+    }
+
+    .code-digit:focus {
+      border-color: var(--money-green);
+      box-shadow: var(--shadow-sm);
+      background: white;
+      transform: translateY(-2px);
+    }
+
+    .code-digit.filled {
+      background: var(--money-light);
+      border-color: var(--money-green);
+    }
+
+    /* Buttons */
+    .login-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: var(--money-green);
+      color: white;
+      border: var(--border-w) solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.12s;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .login-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px var(--border);
+    }
+
+    .login-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px var(--border);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-btn.gold {
+      background: var(--gold);
+      color: var(--text);
+    }
+
+    /* Error Message */
+    .error-msg {
+      background: #fee2e2;
+      border: 2px solid var(--cash-red);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cash-red);
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .error-msg.visible { display: block; }
+
+    /* Success */
+    .success-msg {
+      background: var(--money-light);
+      border: 2px solid var(--money-green);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--money-dark);
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .success-msg.visible { display: block; }
+
+    /* Footer */
+    .login-footer {
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .login-card { padding: 28px 20px; }
+      .code-digit { width: 42px; height: 52px; font-size: 1.3rem; }
+      .qr-container img { width: 160px; height: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating money signs background -->
+  <div class="money-bg" id="money-bg"></div>
+
+  <div class="login-container">
+    <!-- Step 1: Loading -->
+    <div class="login-card" id="loading-view">
+      <div class="login-logo">
+        <div class="login-logo-icon">$</div>
+        <div class="login-logo-text">Tele<span class="green">Vault</span></div>
+      </div>
+      <div class="login-divider">════════════════════</div>
+      <div class="lock-icon">⏳</div>
+      <p class="login-title">CHECKING VAULT...</p>
+    </div>
+
+    <!-- Login Lock Screen -->
+    <div class="login-card" id="login-view" style="display:none;">
+      <div class="login-logo">
+        <div class="login-logo-icon">$</div>
+        <div class="login-logo-text">Tele<span class="green">Vault</span></div>
+      </div>
+      <div class="login-divider">════════════════════</div>
+      <div class="lock-icon">🔒</div>
+      <p class="login-title">VAULT LOCKED</p>
+      <p class="login-subtitle">Enter your 6-digit Google Authenticator code to unlock</p>
+
+      <div class="error-msg" id="login-error"></div>
+
+      <div class="code-input-group" id="login-code-group">
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" class="code-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      </div>
+
+      <button class="login-btn" id="login-btn">UNLOCK VAULT</button>
+      <div class="login-footer">SECURED BY GOOGLE AUTHENTICATOR</div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Init =====
+    document.addEventListener("DOMContentLoaded", async () => {
+      createMoneyBg();
+      setupCodeInputs("login-code-group");
+
+      try {
+        const res = await fetch("/api/auth/status");
+        const data = await res.json();
+
+        if (data.isLoggedIn) {
+          window.location.href = "/";
+          return;
+        }
+
+        document.getElementById("loading-view").style.display = "none";
+        document.getElementById("login-view").style.display = "block";
+        document.querySelector("#login-code-group .code-digit").focus();
+      } catch (err) {
+        document.getElementById("loading-view").style.display = "none";
+        document.getElementById("login-view").style.display = "block";
+      }
+    });
+
+    // ===== Login =====
+    document.getElementById("login-btn").addEventListener("click", async () => {
+      const code = getCode("login-code-group");
+      if (code.length !== 6) return showError("login-error", "Enter all 6 digits");
+
+      const btn = document.getElementById("login-btn");
+      btn.disabled = true;
+      btn.textContent = "UNLOCKING...";
+
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          btn.textContent = "✓ VAULT UNLOCKED!";
+          btn.style.background = "#0ead69";
+          setTimeout(() => { window.location.href = "/"; }, 500);
+        } else {
+          showError("login-error", data.error || "Invalid code");
+          btn.disabled = false;
+          btn.textContent = "UNLOCK VAULT";
+          clearCode("login-code-group");
+        }
+      } catch (err) {
+        showError("login-error", "Connection error");
+        btn.disabled = false;
+        btn.textContent = "UNLOCK VAULT";
+      }
+    });
+
+    // ===== Code Input Helpers =====
+    function setupCodeInputs(groupId) {
+      const group = document.getElementById(groupId);
+      const inputs = group.querySelectorAll(".code-digit");
+
+      inputs.forEach((input, i) => {
+        input.addEventListener("input", (e) => {
+          const val = e.target.value.replace(/[^0-9]/g, "");
+          e.target.value = val;
+          if (val && i < inputs.length - 1) {
+            inputs[i + 1].focus();
+          }
+          e.target.classList.toggle("filled", val.length > 0);
+
+          // Auto-submit when all 6 filled
+          if (getCode(groupId).length === 6) {
+            if (groupId === "login-code-group") {
+              document.getElementById("login-btn").click();
+            }
+          }
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !e.target.value && i > 0) {
+            inputs[i - 1].focus();
+            inputs[i - 1].value = "";
+            inputs[i - 1].classList.remove("filled");
+          }
+          if (e.key === "Enter") {
+            if (groupId === "setup-code-group") document.getElementById("setup-btn").click();
+            if (groupId === "login-code-group") document.getElementById("login-btn").click();
+          }
+        });
+
+        // Handle paste
+        input.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData.getData("text") || "").replace(/[^0-9]/g, "").slice(0, 6);
+          pasted.split("").forEach((digit, j) => {
+            if (inputs[i + j]) {
+              inputs[i + j].value = digit;
+              inputs[i + j].classList.add("filled");
+            }
+          });
+          if (pasted.length > 0 && inputs[Math.min(i + pasted.length, inputs.length - 1)]) {
+            inputs[Math.min(i + pasted.length, inputs.length - 1)].focus();
+          }
+        });
+      });
+    }
+
+    function getCode(groupId) {
+      return Array.from(document.querySelectorAll(`#${groupId} .code-digit`))
+        .map(i => i.value).join("");
+    }
+
+    function clearCode(groupId) {
+      document.querySelectorAll(`#${groupId} .code-digit`).forEach(i => {
+        i.value = "";
+        i.classList.remove("filled");
+      });
+      document.querySelector(`#${groupId} .code-digit`).focus();
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      el.textContent = "✕ " + msg;
+      el.classList.add("visible");
+      setTimeout(() => el.classList.remove("visible"), 4000);
+    }
+
+    // ===== Floating Money Background =====
+    function createMoneyBg() {
+      const container = document.getElementById("money-bg");
+      const symbols = ["$", "₿", "€", "£", "¥", "$"];
+      for (let i = 0; i < 20; i++) {
+        const el = document.createElement("div");
+        el.className = "money-float";
+        el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        el.style.left = Math.random() * 100 + "%";
+        el.style.fontSize = (Math.random() * 3 + 1.5) + "rem";
+        el.style.animationDuration = (Math.random() * 15 + 10) + "s";
+        el.style.animationDelay = (Math.random() * 10) + "s";
+        container.appendChild(el);
+      }
+    }
+  </script>
+</body>
+</html>

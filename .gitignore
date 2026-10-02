@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Environment Variables (Keep your Telegram Bot Token secure!)
+.env
+
+# Temporary and local data
+temp_uploads/
+file_index.json
+auth.json
+
+# System files
+.DS_Store
+Thumbs.db

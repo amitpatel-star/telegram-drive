@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TeleDrive 💰 — Your Vault, Powered by Telegram</title>
+  <meta name="description" content="Store, organize, and share files using Telegram. Retro money style." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Scanlines overlay -->
+  <div class="scanlines"></div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- App Layout -->
+  <div class="app-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-symbol">$</span>
+          <span class="logo-text">Tele<span class="gold">Vault</span></span>
+        </div>
+      </div>
+
+      <!-- Upload Button -->
+      <button class="sidebar-upload-btn" id="sidebar-upload-btn">
+        <span class="btn-icon">↑</span>
+        <span>DEPOSIT FILE</span>
+      </button>
+      <input type="file" id="file-input" multiple hidden />
+      <input type="file" id="folder-input" webkitdirectory directory multiple hidden />
+
+      <!-- Nav Categories -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">VAULT</div>
+        <button class="nav-item active" data-view="all" id="nav-all">
+          <span class="nav-icon">◆</span>
+          <span class="nav-label">All Assets</span>
+          <span class="nav-count" id="count-all">0</span>
+        </button>
+        <button class="nav-item" data-view="folder" data-folder="root" id="nav-drive">
+          <span class="nav-icon">▣</span>
+          <span class="nav-label">My Drive</span>
+        </button>
+        <button class="nav-item" data-view="starred" id="nav-starred">
+          <span class="nav-icon">★</span>
+          <span class="nav-label">Starred</span>
+        </button>
+
+        <div class="nav-section-label">CATEGORIES</div>
+        <button class="nav-item" data-view="category" data-category="images" id="nav-images">
+          <span class="nav-icon">▨</span>
+          <span class="nav-label">Images</span>
+          <span class="nav-count" id="count-images">0</span>
+        </button>
+        <button class="nav-item" data-view="category" data-category="videos" id="nav-videos">
+          <span class="nav-icon">▶</span>
+          <span class="nav-label">Videos</span>
+          <span class="nav-count" id="count-videos">0</span>
+        </button>
+        <button class="nav-item" data-view="category" data-category="audio" id="nav-audio">
+          <span class="nav-icon">♫</span>
+          <span class="nav-label">Audio</span>
+          <span class="nav-count" id="count-audio">0</span>
+        </button>
+        <button class="nav-item" data-view="category" data-category="documents" id="nav-docs">
+          <span class="nav-icon">▤</span>
+          <span class="nav-label">Documents</span>
+          <span class="nav-count" id="count-documents">0</span>
+        </button>
+        <button class="nav-item" data-view="category" data-category="archives" id="nav-archives">
+          <span class="nav-icon">▧</span>
+          <span class="nav-label">Archives</span>
+          <span class="nav-count" id="count-archives">0</span>
+        </button>
+      </nav>
+
+      <!-- Storage Info -->
+      <div class="sidebar-footer">
+        <div class="vault-stats">
+          <div class="vault-stat-row">
+            <span>ASSETS</span>
+            <span class="gold" id="footer-files">0</span>
+          </div>
+          <div class="vault-stat-row">
+            <span>STORED</span>
+            <span class="gold" id="footer-size">0 B</span>
+          </div>
+          <div class="vault-stat-row">
+            <span>WITHDRAWN</span>
+            <span class="gold" id="footer-downloads">0</span>
+          </div>
+        </div>
+        <div class="vault-capacity">
+          <div class="vault-capacity-bar">
+            <div class="vault-capacity-fill" id="vault-capacity-fill"></div>
+          </div>
+          <span class="vault-capacity-text">∞ UNLIMITED STORAGE</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+        <div class="search-box">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="search-input" placeholder="Search the vault..." autocomplete="off" />
+        </div>
+        <div class="topbar-actions">
+          <button class="topbar-btn" id="btn-new-folder" title="New Folder">
+            <span>+ FOLDER</span>
+          </button>
+          <button class="topbar-btn view-toggle" id="btn-view-toggle" title="Toggle View">
+            <span id="view-toggle-icon">▦</span>
+          </button>
+          <button class="topbar-btn lock-btn" id="btn-lock" title="Lock Vault Now">
+            <span>🔒 LOCK</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Breadcrumb -->
+      <div class="breadcrumb" id="breadcrumb">
+        <span class="crumb active">All Assets</span>
+      </div>
+
+      <!-- Drop Zone (hidden until drag) -->
+      <div class="drop-overlay" id="drop-overlay">
+        <div class="drop-overlay-content">
+          <span class="drop-icon">$</span>
+          <span class="drop-text">DROP TO DEPOSIT</span>
+        </div>
+      </div>
+
+      <!-- Upload Progress -->
+      <div class="upload-progress-list" id="upload-progress-list"></div>
+
+      <!-- Folders Row -->
+      <div class="folders-row" id="folders-row" style="display:none;">
+        <!-- folders rendered here -->
+      </div>
+
+      <!-- Files Grid -->
+      <div class="files-container" id="files-container">
+        <div class="files-grid" id="files-grid"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <div class="empty-icon">$</div>
+        <p class="empty-title">VAULT IS EMPTY</p>
+        <p class="empty-sub">Deposit files to fill your vault</p>
+        <button class="retro-btn" id="empty-upload-btn">DEPOSIT NOW</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Share Page (hidden by default) -->
+  <div class="share-page" id="share-page" style="display:none;">
+    <div class="share-card">
+      <div class="share-logo">$ TeleVault</div>
+      <div class="share-divider">════════════════════</div>
+      <h1 class="share-filename" id="share-filename">Loading...</h1>
+      <div class="share-meta">
+        <span id="share-size"></span>
+        <span class="share-dot">·</span>
+        <span id="share-date"></span>
+      </div>
+      <a class="retro-btn retro-btn-lg" id="share-download-btn" href="#">↓ WITHDRAW FILE</a>
+      <div class="share-divider">════════════════════</div>
+      <p class="share-footer">Secured by TeleVault™</p>
+    </div>
+  </div>
+
+  <!-- Modal: Share Link -->
+  <div class="modal-overlay" id="modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>$ SHARE ASSET</h3>
+        <button class="modal-close" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-filename" id="modal-filename"></p>
+        <div class="share-link-box">
+          <input type="text" id="share-link-input" readonly />
+          <button class="retro-btn retro-btn-sm" id="copy-link-btn">COPY</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: New Folder -->
+  <div class="modal-overlay" id="folder-modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>+ NEW FOLDER</h3>
+        <button class="modal-close" id="folder-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="folder-name-input" placeholder="Folder name..." class="modal-input" maxlength="50" />
+        <button class="retro-btn" id="folder-create-btn" style="margin-top:12px;width:100%">CREATE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Move File -->
+  <div class="modal-overlay" id="move-modal-overlay" style="display:none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>→ MOVE TO FOLDER</h3>
+        <button class="modal-close" id="move-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="folder-list" id="move-folder-list">
+          <!-- folders rendered here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
